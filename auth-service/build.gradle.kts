@@ -34,6 +34,13 @@ dependencies {
 
 }
 
+//sourceSets.getByName("main").java.srcDir("$buildDir/generated/server/src/main/java")
+//sourceSets.getByName("test").java.srcDir("$buildDir/generated/server/src/test/java")
+
+sourceSets.getByName("main").java.srcDir(File("$buildDir/generated/server/src/main/java"))
+sourceSets.getByName("test").java.srcDir(File("$buildDir/generated/server/src/test/java"))
+
+
 tasks.withType<Test> {
 		useJUnitPlatform()
 }
@@ -42,10 +49,10 @@ tasks.withType<Test> {
 openApiGenerate {
 		generatorName.set("spring")
 		inputSpec.set("$projectDir/src/main/resources/static/openapi/server/openapi.yaml")
-		templateDir.set("$projectDir/src/main/resources/static/openapi/server/templates") // непонятно, зачем. Туда вроде бы ничего не попадает
-		outputDir.set("${buildDir}/generated/server") // buildDir deprecated, но {layout.buildDirectory} не работает
-		apiPackage.set("org.zheleznikov.generated.api") // непонятно, какие надо указывать
-		modelPackage.set("org.zheleznikov.generated.model") // непонятно, какие надо указывать org.zheleznikov.generated.model
+		templateDir.set("$projectDir/src/main/resources/static/openapi/server/templates")
+		outputDir.set("${buildDir}/generated/server")
+		apiPackage.set("org.zheleznikov.generated.api")
+		modelPackage.set("org.zheleznikov.generated.model")
 
 		configOptions.putAll(
 						mapOf(
@@ -70,40 +77,10 @@ openApiGenerate {
 }
 
 tasks {
-		build {
+		compileJava {
 				dependsOn(openApiGenerate)
 		}
 }
-
-/*
-
-tasks.register('TASK_NAME', GenerateTask) {
-		generatorName = "spring"
-		inputSpec = "$projectDir/src/main/resources/static/openapi/server/YOUR_SPECIFICATION_FILE.yaml".toString()
-		templateDir = "$projectDir/src/main/resources/static/openapi/server/templates"
-		outputDir = "$buildDir/generated/server".toString()
-		apiPackage = "com.dummy.foo.generated.any.api"
-		modelPackage = "com.dummy.foo.generated.any.model"
-
-		configOptions = [
-				library          : "spring-boot",
-				useSpringBoot3   : "true",
-				dateLibrary      : "java8",
-				java8            : "true",
-				delegatePattern  : "true",
-				useBeanValidation: "true",
-				useTags          : "true"
-		]
-
-		typeMappings = [
-						"local-date-time": "java.time.LocalDateTime",
-						"legacy-date"    : "java.util.Date",
-						"java-period"    : "java.time.Period",
-		]
-
-}
-
- */
 
 
 
