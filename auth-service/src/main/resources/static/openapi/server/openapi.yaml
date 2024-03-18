@@ -1,0 +1,105 @@
+openapi: 3.0.3
+
+info:
+  title: Service name
+  description: First steps for creating service
+  version: 1.0.1
+
+servers:
+  - url: https://api.server.org/data/1.0.1/
+    description: Production server
+
+tags:
+  - name: auth
+    description: User registration and login/logout
+
+paths:
+  /api/user/signin:
+    post:
+      tags:
+        - auth
+      summary: API for user to sign in
+      description: API for user to sign in
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+      responses:
+        200:
+          description: success responses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessAuthResponse'
+        400:
+          description: user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        503:
+          description: service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+
+components:
+  schemas:
+
+    SignUpRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Serg
+        email:
+          type: string
+          format: email
+          example: 'serg@zhele.org'
+
+        password:
+          type: string
+          format: password
+          example: qwe123
+
+
+
+    SuccessAuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+
+        refreshToken:
+          type: string
+
+        success:
+          type: boolean
+
+        user:
+          $ref: '#/components/schemas/User'
+
+    AuthResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+        success: # под вопросом
+          type: boolean
+
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Serg
+
+        email:
+          type: string
+          format: email
+          example: erg@zhele.org
