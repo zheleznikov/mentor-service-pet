@@ -16,6 +16,10 @@ repositories {
 		mavenCentral()
 }
 
+springBoot {
+		mainClass.set("org.zheleznikov.authservice.AuthServiceApplication")
+}
+
 dependencies {
 //	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 //	implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -32,13 +36,23 @@ dependencies {
 		testCompileOnly ("org.projectlombok:lombok:1.18.30")
 		testAnnotationProcessor ("org.projectlombok:lombok:1.18.30")
 
+		/*
+		Dependencies for OPEN API
+		 */
+
+		implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+		implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+
+
+
 }
 
-//sourceSets.getByName("main").java.srcDir("$buildDir/generated/server/src/main/java")
-//sourceSets.getByName("test").java.srcDir("$buildDir/generated/server/src/test/java")
+sourceSets.getByName("main").java.srcDir("$buildDir/generated/server/src/main/java")
+sourceSets.getByName("test").java.srcDir("$buildDir/generated/server/src/test/java")
 
-sourceSets.getByName("main").java.srcDir(File("$buildDir/generated/server/src/main/java"))
-sourceSets.getByName("test").java.srcDir(File("$buildDir/generated/server/src/test/java"))
+//sourceSets.getByName("main").java.srcDirs(File(buildDir, "generated/server/src/main/java"))
+//sourceSets.getByName("test").java.srcDirs(File(buildDir, "generated/server/src/test/java"))
+
 
 
 tasks.withType<Test> {
@@ -58,6 +72,7 @@ openApiGenerate {
 						mapOf(
 										Pair("library", "spring-boot"),
 										Pair("useSpringBoot3", "true"),
+										Pair("useSwaggerUI", "true"),
 										Pair("datesLibrary", "java8"),
 										Pair("java8", "true"),
 										Pair("delegatePattern", "true"),
