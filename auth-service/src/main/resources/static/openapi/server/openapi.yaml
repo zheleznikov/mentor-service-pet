@@ -1,56 +1,204 @@
 openapi: 3.0.3
-
 info:
-  title: Service name
-  description: First steps for creating service
+  title: Mentor service - pet
   version: 1.0.1
-
-servers:
-  - url: https://api.server.org/data/1.0.1/
-    description: Production server
-
 tags:
   - name: auth
     description: User registration and login/logout
 
 paths:
-  /api/user/signin:
+
+  /api/v1/user/signup:
     post:
       tags:
         - auth
-      summary: API for user to sign in
-      description: API for user to sign in
-
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignUpRequest'
+              $ref: '#/components/schemas/SignupRequest'
       responses:
-        200:
-          description: success responses
+        default:
+          description: User successfully created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessAuthResponse'
+                $ref: '#/components/schemas/SuccessSignupResponse'
+        201:
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessSignupResponse'
+        400:
+          description: Invalid JSON or required fields are empty
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserSignupResponse'
+        409:
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserSignupResponse'
+        500:
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCommonResponse'
+
+  /api/v1/user/signup-code:
+    post:
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmationCodeRequest'
+      responses:
+        default:
+          description: Code was sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessCommonResponse'
+        200:
+          description:  Code was sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessCommonResponse'
+        400:
+          description: Email not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCommonResponse'
+
+        500:
+          description: Wrong confrimed code, Invalid JSON etc
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCommonResponse'
+
+
+  /api/v1/user/signup-confirmation:
+    post:
+      tags:
+        - auth
+      summary: second step for user to signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmSignupRequest'
+      responses:
+        default:
+          description: Email successfully confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessLoginResponse'
+        200:
+          description: Email successfully confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessLoginResponse'
+        400:
+          description: Wrong confrimed code, Invalid JSON etc
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserSignupConfirmResponse'
+        500:
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCommonResponse'
+
+
+
+  /api/v1/user/login:
+    post:
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        default:
+          description: User successfully login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessLoginResponse'
+        200:
+          description: User successfully login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessLoginResponse'
+        400:
+          description: Invalid JSON, params are wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCommonResponse'
+        401:
+          description: Wrong email or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCommonResponse'
+        500:
+          description: Wrong confrimed code, Invalid JSON etc
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCommonResponse'
+  /api/user/logout:
+    get:
+      tags:
+        - auth
+      summary: API for user to logout
+      security:
+        - bearerAuth: []
+      responses:
+        204: # или все таки 200
+          description: success logout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessCommonResponse'
         400:
           description: user already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        503:
-          description: service unavailable
+                $ref: '#/components/schemas/ErrorCommonResponse'
+        500:
+          description: user already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-
-
+                $ref: '#/components/schemas/ErrorCommonResponse'
+        default: # или все таки 200
+          description: success logout
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessCommonResponse'
 components:
   schemas:
-
-    SignUpRequest:
+    SignupRequest:
       type: object
       properties:
         name:
@@ -59,47 +207,186 @@ components:
         email:
           type: string
           format: email
-          example: 'serg@zhele.org'
-
+          example: serg@zhele.org
         password:
           type: string
           format: password
           example: qwe123
+        confirmPassword:
+          type: string
+          format: password
+          example: qwe123
+        role:
+          $ref: '#/components/schemas/Role'
+      required:
+        - name
+        - email
+        - password
+        - confirmPassword
+        - role
 
-
-
-    SuccessAuthResponse:
+    ConfirmSignupRequest:
       type: object
       properties:
-        accessToken:
+        email:
           type: string
+          format: email
+          example: serg@zhele.org
+        code:
+          type: integer
+          example: 1111
+      required:
+        - email
+        - code
 
-        refreshToken:
-          type: string
-
-        success:
-          type: boolean
-
-        user:
-          $ref: '#/components/schemas/User'
-
-    AuthResponse:
+    LoginRequest:
       type: object
       properties:
+        email:
+          type: string
+          format: email
+          example: serg@zhele.org
+        password:
+          type: string
+          format: password
+          example: qwe123
+      required:
+        - email
+        - password
+
+    ConfirmationCodeRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: serg@zhele.ru
+
+    SuccessSignupResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 201
         message:
           type: string
-
-        success: # под вопросом
-          type: boolean
-
+          example: Verification code was sent to email
+        signupStatus:
+          $ref: '#/components/schemas/SignupStatus'
+        userInfo:
+          $ref: '#/components/schemas/User'
+    ErrorUserSignupResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: Something wrong with user request
+    SuccessLoginResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Email successfully confirmed
+        signupStatus:
+          $ref: '#/components/schemas/SignupStatus'
+        userInfo:
+          $ref: '#/components/schemas/User'
+        tokenInfo:
+          $ref: '#/components/schemas/Token'
+    ErrorUserSignupConfirmResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: Something wrong with user request
+        signupStatus:
+          $ref: '#/components/schemas/SignupStatus'
+        userInfo:
+          $ref: '#/components/schemas/User'
+    ErrorCommonResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 500
+        message:
+          type: string
+          example: Something bad happened with server
+    SuccessCommonResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Something bad happened with server
     User:
       type: object
       properties:
         name:
           type: string
           example: Serg
-
         email:
           type: string
           format: email
-          example: erg@zhele.org
+          example: serg@zhele.org
+        role:
+          $ref: '#/components/schemas/Role'
+    Role:
+      type: string
+      enum:
+        - USER_MENTOR
+        - USER_MENTY
+        - ADMIN
+      default: USER_MENTY
+    SignupStatus:
+      type: object
+      properties:
+        registered:
+          type: boolean
+          example: true
+        confirmed:
+          type: boolean
+          example: false
+    Token:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NGU4MmM1NDVjNmYyMDAxYmU2ZjQ4YyIsImlhdCI6MTcxMDM1MzU4OSwiZXhwIjoxNzEwMzU0Nzg5fQ.K9sQ6LbFafJKBROFooBYEKYcJvWxeU8ZEy7O-Qst1bI'
+        refreshToken:
+          type: string
+          example: '83cd65e6381e756594ea107b44b404a74dbf772a7b8b8cef789b8c297950d4c7683e222dfe081507'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
