@@ -14,6 +14,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+/*
+    Проводим ли мы проверку логина пароля в самописных сервисах или
+    создаем фильтр, который добавляем в spring security и уже настраиваем его?
+ */
 public class SecurityConfig {
 
     @Bean

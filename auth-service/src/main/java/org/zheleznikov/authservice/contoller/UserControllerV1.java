@@ -49,9 +49,6 @@ public class UserControllerV1 {
 
 
     @GetMapping("/api/v1/user/logout")
-    /*
-        Надо брать токен из заголовка и валидировать его
-     */
     public SuccessCommonResponse logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         return loginUserService.logout(token);
     }

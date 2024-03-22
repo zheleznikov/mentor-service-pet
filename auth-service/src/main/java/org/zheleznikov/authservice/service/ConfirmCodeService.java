@@ -62,27 +62,10 @@ public class ConfirmCodeService {
        userCodeRepository.save(userCodeEntity.setIsConfirmed(true));
     }
 
-    public void verifyCode2(Integer code, UserEntity user) {
-        /*
-        ! По идее метод должен
-        1. Сомнительная реализация
-         */
-        String exceptionMessage = "The code is incorrect or it has already been used or code expired";
-
-        UserCode userCodeEntity = user.getUserCode()
-                .stream()
-                .filter(userCode -> LocalDateTime.now().isBefore(userCode.getExpiredTimestamp()))
-                .filter(userCode -> userCode.getIsConfirmed().equals(false))
-                .filter(userCode -> Objects.equals(userCode.getCode(), code))
-                .findAny()
-                .orElseThrow(() -> new SignupException(exceptionMessage));
-
-        userCodeRepository.save(userCodeEntity.setIsConfirmed(true));
-    }
 
     private int generateCode() {
         int from = 1000;
         int to = 9999;
-        return (int) ((Math.random() * (to - from)) + to);
+        return (int) ((Math.random() * (to - from)) + from);
     }
 }

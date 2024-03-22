@@ -39,13 +39,14 @@ public class SignupUserService {
 
 
     public SuccessSignupResponse saveNewUser(SignupRequest request) {
-
         validateIfPasswordsDoNotMatch(request);
-        validateIfEmailAlreadyExists(request, userRepository);
-
-        LocalDateTime now = LocalDateTime.now();
 
         try {
+            validateIfEmailAlreadyExists(request, userRepository);
+
+            LocalDateTime now = LocalDateTime.now();
+
+
             UserEntity userEntity = new UserEntity()
                     .setSignupTimestamp(now)
                     .setName(request.getName())
@@ -79,15 +80,15 @@ public class SignupUserService {
 
 
     public SuccessLoginResponse confirmUserSignup(ConfirmSignupRequest request) {
-        UserEntity userEntity = userRepository.findByEmail(request.getEmail());
-
-        validateIfUserExists(userEntity);
-        validateIfConfirmationCodeCreated(userEntity);
-
-
-        confirmCodeService.verifyCode(request.getCode(), userEntity);
-
+        // надо ли оборачивать это все в try-catch
         try {
+            UserEntity userEntity = userRepository.findByEmail(request.getEmail());
+
+            validateIfUserExists(userEntity);
+            validateIfConfirmationCodeCreated(userEntity);
+
+            confirmCodeService.verifyCode(request.getCode(), userEntity);
+
             LocalDateTime now = LocalDateTime.now();
 
             userRepository.save(userEntity
@@ -124,12 +125,10 @@ public class SignupUserService {
         LocalDateTime now = LocalDateTime.now();
 
         SuccessCommonResponse response = new SuccessCommonResponse();
-
         response.setTimestamp(now.atOffset(OffsetDateTime.now().getOffset()));
         response.setStatus(200);
         response.setMessage("Code send to email " + request.getEmail());
 
         return response;
-
     }
 }

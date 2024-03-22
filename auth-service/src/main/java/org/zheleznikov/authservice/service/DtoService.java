@@ -9,6 +9,7 @@ import org.zheleznikov.generated.model.User;
 /**
  * Это сервис, пока я не придумал ничего лучше, как быстро формировать DTO из open api
  * без использования @accessors(chain = true)
+ * Непонятно, как убрать сеттеры из генерации open api
  */
 public class DtoService {
 

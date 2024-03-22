@@ -28,6 +28,9 @@ import java.util.List;
 @Accessors(chain = true)
 @ToString
 public class UserEntity {
+    /*
+    Как вообще такая модель данных? Может быть нужно еше что-то?
+     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

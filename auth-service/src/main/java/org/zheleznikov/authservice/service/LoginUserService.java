@@ -21,6 +21,7 @@ import static org.zheleznikov.authservice.service.ValidationService.validateIfUs
 
 @Service
 @RequiredArgsConstructor
+// для логина и логаута сделал один сервис. а для сиг
 public class LoginUserService {
 
     private final UserRepository userRepository;
@@ -28,21 +29,25 @@ public class LoginUserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final UserTokenService userTokenService;
+
     public SuccessLoginResponse loginUser(LoginRequest request) {
-        UserEntity userEntity = userRepository.findByEmail(request.getEmail());
 
-        validateIfUserExists(userEntity);
-        validateIfPasswordCorrect(request, userEntity, bCryptPasswordEncoder);
-
+        // надо ли вообще оборачивать сохранение в постгрес и редис в try-catcn
         try {
+            UserEntity userEntity = userRepository.findByEmail(request.getEmail());
+
+            validateIfUserExists(userEntity);
+            validateIfPasswordCorrect(request, userEntity, bCryptPasswordEncoder);
+
             LocalDateTime now = LocalDateTime.now();
 
             userRepository.save(userEntity.setLastLoginTimestamp(now));
 
             UserToken token = userTokenService.saveToken(userEntity.getEmail());
 
+            // создание ответа это не очень красиво выглядит, занимает много места
             SuccessLoginResponse response = new SuccessLoginResponse();
-            response.setMessage("User login");
+            response.setMessage("User successfully login");
             response.setStatus(200);
             response.setTimestamp(now.atOffset(OffsetDateTime.now().getOffset()));
 
@@ -59,6 +64,7 @@ public class LoginUserService {
 
     public SuccessCommonResponse logout(String accessToken) {
         SuccessCommonResponse response = new SuccessCommonResponse();
+
 
         userTokenService.findUserByToken(accessToken);
 

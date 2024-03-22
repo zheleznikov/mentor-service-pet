@@ -19,6 +19,11 @@ import java.time.LocalDateTime;
 @Setter
 @Accessors(chain = true)
 @ToString
+        /*
+        Можно сохранить в редис. Нужны ли будут там все эти поля?
+
+        Что еще можно добавить?
+         */
 public class UserCode {
 
     @Id
